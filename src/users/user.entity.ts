@@ -1,5 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
-@Entity()
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  CreateDateColumn,
+} from 'typeorm';
+import { Review } from '../reviews/review.entity';
+import { Rating } from '../ratings/rating.entity';
+
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -13,6 +22,15 @@ export class User {
   @Column()
   name: string;
 
-  @Column({ default: 'user' })
+  @Column({ default: 'USER' })
   role: string;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @OneToMany(() => Review, (review) => review.user)
+  reviews: Review[];
+
+  @OneToMany(() => Rating, (rating) => rating.user)
+  ratings: Rating[];
 }
