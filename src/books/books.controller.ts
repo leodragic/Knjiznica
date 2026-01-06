@@ -7,6 +7,7 @@ import {
   Param,
   Body,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { JwtAuthGuard } from '../auth/jwt/jwt.guard';
@@ -41,5 +42,11 @@ export class BooksController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.booksService.remove(+id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('recommended')
+  getRecommended(@Req() req) {
+    return this.booksService.getRecommendedForUser(req?.user?.id);
   }
 }
