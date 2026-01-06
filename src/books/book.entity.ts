@@ -25,6 +25,9 @@ export class Book {
   @Column({ type: 'text', nullable: true })
   description: string;
 
+  @Column({ default: 0 })
+  averageRating: number;
+
   @Column({ nullable: true })
   cover_image: string;
 
