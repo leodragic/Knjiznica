@@ -20,11 +20,16 @@ export class BooksService {
   }
 
   findAll() {
-    return this.bookRepository.find();
+    return this.bookRepository.find({
+      relations: ['category'],
+    });
   }
 
   async findOne(id: number) {
-    const book = await this.bookRepository.findOne({ where: { id } });
+    const book = await this.bookRepository.findOne({
+      where: { id },
+      relations: ['category'],
+    });
     if (!book) throw new NotFoundException('Book not found');
     return book;
   }
