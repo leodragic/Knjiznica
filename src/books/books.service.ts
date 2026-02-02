@@ -104,12 +104,7 @@ export class BooksService {
     return this.bookRepository
       .createQueryBuilder('book')
       .leftJoinAndSelect('book.category', 'category')
-      .leftJoin(
-        'book.ratings',
-        'rating',
-        'rating.userId = :userId',
-        { userId },
-      )
+      .leftJoin('book.ratings', 'rating', 'rating.userId = :userId', { userId })
       .where('category.id = :categoryId', { categoryId })
       .andWhere('rating.id IS NULL')
       .orderBy('book.averageRating', 'DESC')
