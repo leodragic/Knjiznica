@@ -47,7 +47,12 @@ export default function RecommendedBooks() {
             <br />
             <em>Kategorija: {book.category?.name ?? 'Neznano'}</em>
             <br />
-            <small>Povprečna ocena: {book.averageRating ?? 'Ni ocen'}</small>
+            <small>
+              Povprečna ocena:{' '}
+              {book.averageRating !== undefined
+                ? Number(book.averageRating).toFixed(2)
+                : 'Ni ocen'}
+            </small>
           </li>
         ))}
       </ul>

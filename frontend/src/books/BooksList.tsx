@@ -52,7 +52,9 @@ export default function BooksList() {
           </p>
           <p>
             <strong>Povprečna ocena:</strong>{' '}
-            {book.averageRating ?? 'Ni ocen'}
+            {book.averageRating !== undefined
+              ? Number(book.averageRating).toFixed(2)
+              : 'Ni ocen'}
           </p>
         </div>
       ))}
