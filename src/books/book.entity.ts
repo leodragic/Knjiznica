@@ -25,7 +25,7 @@ export class Book {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ default: 0 })
+  @Column({ type: 'decimal', precision: 3, scale: 2, default: 0 })
   averageRating: number;
 
   @Column({ nullable: true })
