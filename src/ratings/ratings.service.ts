@@ -35,7 +35,9 @@ export class RatingsService {
       where: { book: { id: book.id } },
     });
     const avg =
-      allRatings.reduce((sum, r) => sum + r.rating, 0) / allRatings.length;
+      allRatings.length === 0
+        ? 0
+        : allRatings.reduce((sum, r) => sum + r.rating, 0) / allRatings.length;
     book.averageRating = parseFloat(avg.toFixed(2));
     await this.booksService.update(book.id, {
       averageRating: book.averageRating,

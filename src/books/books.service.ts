@@ -8,11 +8,15 @@ import { Rating } from '../ratings/rating.entity';
 export class BooksService {
   constructor(
     @InjectRepository(Book)
-    private bookRepository: Repository<Book>,
+    private readonly bookRepository: Repository<Book>,
 
     @InjectRepository(Rating)
-    private ratingRepository: Repository<Rating>,
+    private readonly ratingRepository: Repository<Rating>,
   ) {}
+
+  // =====================
+  // CRUD
+  // =====================
 
   create(data: Partial<Book>) {
     const book = this.bookRepository.create(data);
@@ -26,11 +30,19 @@ export class BooksService {
   }
 
   async findOne(id: number) {
+    if (!id || isNaN(Number(id))) {
+      throw new NotFoundException('Invalid book id');
+    }
+
     const book = await this.bookRepository.findOne({
       where: { id },
       relations: ['category'],
     });
-    if (!book) throw new NotFoundException('Book not found');
+
+    if (!book) {
+      throw new NotFoundException('Book not found');
+    }
+
     return book;
   }
 
@@ -44,44 +56,63 @@ export class BooksService {
     const book = await this.findOne(id);
     return this.bookRepository.remove(book);
   }
+
+  // =====================
+  // RECOMMENDATIONS
+  // =====================
+
   async getRecommendedForUser(userId?: number) {
-    // Če uporabnik NI prijavljen → top-rated knjige
-    if (!userId) {
+    // Fallback: top-rated knjige
+    const getTopRated = () => {
       return this.bookRepository.find({
         order: { averageRating: 'DESC' },
         take: 5,
         relations: ['category'],
       });
+    };
+
+    // Če uporabnik ni prijavljen
+    if (!userId || isNaN(Number(userId))) {
+      return getTopRated();
     }
 
-    // Najdi zadnjo VISOKO oceno (4 ali 5)
+    // Najdi zadnjo visoko oceno (4 ali 5)
     const lastHighRating = await this.ratingRepository.findOne({
       where: {
         user: { id: userId },
-        rating: 4,
       },
       order: { id: 'DESC' },
       relations: ['book', 'book.category'],
     });
 
-    //  Če ni visoke ocene → top-rated
-    if (!lastHighRating) {
-      return this.bookRepository.find({
-        order: { averageRating: 'DESC' },
-        take: 5,
-        relations: ['category'],
-      });
+    // Če ni ratinga ali ni kategorije → fallback
+    if (
+      !lastHighRating ||
+      !lastHighRating.book ||
+      !lastHighRating.book.category
+    ) {
+      return getTopRated();
     }
 
     const categoryId = lastHighRating.book.category.id;
 
-    // Knjige iz iste kategorije, ki jih user še NI ocenil
+    if (!categoryId || isNaN(Number(categoryId))) {
+      return getTopRated();
+    }
+
+    // Knjige iz iste kategorije, ki jih uporabnik še NI ocenil
     return this.bookRepository
       .createQueryBuilder('book')
       .leftJoinAndSelect('book.category', 'category')
-      .leftJoin('book.ratings', 'rating', 'rating.userId = :userId', { userId })
+      .leftJoin(
+        'book.ratings',
+        'rating',
+        'rating.userId = :userId',
+        { userId },
+      )
       .where('category.id = :categoryId', { categoryId })
       .andWhere('rating.id IS NULL')
+      .orderBy('book.averageRating', 'DESC')
       .take(5)
       .getMany();
   }
