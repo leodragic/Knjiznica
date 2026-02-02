@@ -3,6 +3,7 @@ import Login from './auth/Login';
 import Register from './auth/Register';
 import Navbar from './components/Navbar';
 import BooksList from './books/BooksList';
+import RecommendedBooks from './books/RecommendedBooks';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/books" element={<BooksList />} />
+        <Route path="/recommended" element={<RecommendedBooks />} />
       </Routes>
     </BrowserRouter>
   );
