@@ -4,12 +4,14 @@ import Register from './auth/Register';
 import Navbar from './components/Navbar';
 import BooksList from './books/BooksList';
 import RecommendedBooks from './books/RecommendedBooks';
+import Home from './pages/Home.tsx';
 
 function App() {
   return (
     <BrowserRouter>
       <Navbar />
       <Routes>
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/books" element={<BooksList />} />
