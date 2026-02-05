@@ -62,8 +62,8 @@ export class BooksService {
   // =====================
 
   async getRecommendedForUser(userId?: number) {
-    // Fallback: top-rated knjige
-    const getTopRated = () => {
+    // 🔁 Fallback: top-rated knjige
+    const getTopRated = async () => {
       return this.bookRepository.find({
         order: { averageRating: 'DESC' },
         take: 5,
@@ -71,21 +71,22 @@ export class BooksService {
       });
     };
 
-    // Če uporabnik ni prijavljen
+    // 👤 Če uporabnik ni prijavljen
     if (!userId || isNaN(Number(userId))) {
       return getTopRated();
     }
 
-    // Najdi zadnjo visoko oceno (4 ali 5)
+    // ⭐ Najdi ZADNJO VISOKO oceno (4 ali 5)
     const lastHighRating = await this.ratingRepository.findOne({
-      where: {
-        user: { id: userId },
-      },
+      where: [
+        { user: { id: userId }, rating: 5 },
+        { user: { id: userId }, rating: 4 },
+      ],
       order: { id: 'DESC' },
       relations: ['book', 'book.category'],
     });
 
-    // Če ni ratinga ali ni kategorije → fallback
+    // Če ni visoke ocene → fallback
     if (
       !lastHighRating ||
       !lastHighRating.book ||
@@ -100,15 +101,20 @@ export class BooksService {
       return getTopRated();
     }
 
-    // Knjige iz iste kategorije, ki jih uporabnik še NI ocenil
-    return this.bookRepository
+    // 📚 Knjige iz iste kategorije (lahko tudi že ocenjene)
+    const sameCategoryBooks = await this.bookRepository
       .createQueryBuilder('book')
       .leftJoinAndSelect('book.category', 'category')
-      .leftJoin('book.ratings', 'rating', 'rating.userId = :userId', { userId })
       .where('category.id = :categoryId', { categoryId })
-      .andWhere('rating.id IS NULL')
       .orderBy('book.averageRating', 'DESC')
       .take(5)
       .getMany();
+
+    // Če ni rezultatov → fallback
+    if (sameCategoryBooks.length === 0) {
+      return getTopRated();
+    }
+
+    return sameCategoryBooks;
   }
 }

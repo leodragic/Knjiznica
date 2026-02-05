@@ -9,5 +9,6 @@ import { Rating } from '../ratings/rating.entity';
   imports: [TypeOrmModule.forFeature([Book, Rating])],
   providers: [BooksService],
   controllers: [BooksController],
+  exports: [BooksService],
 })
 export class BooksModule {}
