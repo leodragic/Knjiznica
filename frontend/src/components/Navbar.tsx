@@ -9,22 +9,52 @@ export default function Navbar() {
     navigate('/login');
   };
 
-  return (
-    <nav style={{ padding: '10px', borderBottom: '1px solid #ccc' }}>
-      <Link to="/" style={{ marginRight: 10 }}>Domov</Link>
-      <Link to="/books" style={{ marginRight: 10 }}>Knjige</Link>
-      <Link to="/recommended" style={{ marginRight: 10 }}>Priporočamo</Link>
+  const linkStyle = {
+    color: 'white',
+    textDecoration: 'none',
+    marginRight: 16,
+    fontWeight: 500,
+  };
 
-      {!token ? (
-        <>
-          <Link to="/login" style={{ marginRight: 10 }}>Prijava</Link>
-          <Link to="/register">Registracija</Link>
-        </>
-      ) : (
-        <button onClick={logout} style={{ marginLeft: 10 }}>
-          Logout
-        </button>
-      )}
+  return (
+    <nav
+      style={{
+        padding: '14px 24px',
+        backgroundColor: '#4f46e5',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      }}
+    >
+      <div>
+        <Link to="/" style={linkStyle}>Domov</Link>
+        <Link to="/books" style={linkStyle}>Knjige</Link>
+        <Link to="/recommended" style={linkStyle}>Priporočamo</Link>
+      </div>
+
+      <div>
+        {!token ? (
+          <>
+            <Link to="/login" style={linkStyle}>Prijava</Link>
+            <Link to="/register" style={linkStyle}>Registracija</Link>
+          </>
+        ) : (
+          <button
+            onClick={logout}
+            style={{
+              backgroundColor: 'white',
+              color: '#4f46e5',
+              border: 'none',
+              padding: '6px 12px',
+              borderRadius: 4,
+              cursor: 'pointer',
+              fontWeight: 500,
+            }}
+          >
+            Logout
+          </button>
+        )}
+      </div>
     </nav>
   );
 }
